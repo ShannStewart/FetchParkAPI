@@ -1,5 +1,5 @@
 const urlBase = 'https://developer.nps.gov/api/v1/parks?';
-const apiKey = 'AIzaSyCkYLATbWVu42KN49LP6pbjM1Gqd_a_B5Y'
+const apiKey = 'cbKz4jiYcQHjHHnB7OaQLeDhvGw7cLfIvPWFf2A8'
 let requestedState = [];
 let resultNumber = 10;
 
@@ -63,15 +63,7 @@ function parkAPI(requestedState, resultNumber){
 
     console.log('New Search: ' + searchURL);
 
-    fetch(searchURL)
-    .then(response => {
-        if(response.ok){
-            return response.json();
-        }
-        throw new Error(response.statusText);
-    })
-    .then(responseJSON => getPark(responseJSON))
-    .catch(err => alert('what is this noise?'));
+ 
     
 }
 
@@ -91,17 +83,5 @@ function getStateCode(requestedState){
     
 }
 
-function getPark(responseJSON){
-   console.log('getPark ran');
-
-   for (let i = 0; i < responseJSON.data.length; i++){
-
-             $('#results-list').append(
-
-              
-                "<li><h3>" + responseJSON.data[i].fullName + "</h3><p>" + responseJSON.data[i].description + "</p><a href='" + responseJSON.data[i].url + "'>Link</a></li>"
-            )};
-
-   }
 
 $(prepareStates);
