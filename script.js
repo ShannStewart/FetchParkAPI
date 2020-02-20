@@ -24,9 +24,9 @@ function readyFunctions(){
 async function getPark(){
     console.log("getPark ran");
 
-    //  await $('#userSearch').off('click');
+     await $('#parkSearch').off('click');
 
-     $('#parkSearch').on('click', '#findParks', function(event){
+     await $('#parkSearch').on('click', '#findParks', function(event){
         event.preventDefault();
         $('#results-list').empty();
         console.log("results emptied");
@@ -70,7 +70,7 @@ function parkAPI(requestedState, resultNumber){
         }
         throw new Error(response.statusText);
     })
-    .then(responseJSON => console.log(responseJSON))
+    .then(responseJSON => getParkData(responseJSON))
     .catch(err => alert('what is this noise?'));
     
 }
@@ -88,9 +88,24 @@ function getStateCode(requestedState){
 
     return fullCode;
 
+   
     
 }
 
+function getParkData(parkData){
+    console.log('getParkDATA ran');
+ 
+    for (let i = 0; i < parkData.data.length; i++){
+ 
+              $('#results-list').append(
+ 
+               
+                 "<li><h3>" + parkData.data[i].fullName + "</h3><p>" + parkData.data[i].description + "</p><a href='" + parkData.data[i].url + "'>Link</a></li>"
+             )};
+ 
+                readyFunctions();
+
+    }
 
 
 
