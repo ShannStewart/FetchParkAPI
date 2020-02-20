@@ -24,6 +24,9 @@ function readyFunctions(){
 async function getPark(){
     console.log("getPark ran");
 
+        resultNumber = 0;
+        requestedState = [];
+
      await $('#parkSearch').off('click');
 
      await $('#parkSearch').on('click', '#findParks', function(event){
@@ -52,8 +55,17 @@ function parkAPI(requestedState, resultNumber){
 
     console.log('Search: ' + searchURL);
 
-    let stateCode = getStateCode(requestedState);
+    let stateCode = '';
+
+        if (requestedState.length <= 0) {
+        console.log("There is no state code");
+        stateCode = "null";
+        console.log("state code: " + stateCode);    
+   }
+    else{
+         stateCode = getStateCode(requestedState);   
     console.log('code: ' + stateCode);
+    }
 
     searchURL = searchURL + stateCode;
 
@@ -63,6 +75,8 @@ function parkAPI(requestedState, resultNumber){
 
     console.log('New Search: ' + searchURL);
 
+    
+
     fetch(searchURL)
     .then(response => {
         if(response.ok){
@@ -71,7 +85,7 @@ function parkAPI(requestedState, resultNumber){
         throw new Error(response.statusText);
     })
     .then(responseJSON => getParkData(responseJSON))
-    .catch(err => alert('what is this noise?'));
+    .catch(err => alert('No States Were Selected. Try Again'));
     
 }
 

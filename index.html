@@ -11,7 +11,7 @@
 
         <form id='parkSearch'>
             <label>Natural Park Search</label>
-            <input type="number" name="max-results" id="js-max-results" value="10" onkeyup="if(this.value > 10) this.value = null;" onkeydown="if(this.value < 0) this.value = null;">
+            <input type="number" name="max-results" id="js-max-results" value="10" min="1" max="10" onkeyup="if(this.value > 10) this.value = null;" oninput="validity.valid||(value='');">
                 <div>
                     <input type="submit" value="Search" id="findParks">
                 </div>
