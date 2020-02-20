@@ -63,7 +63,15 @@ function parkAPI(requestedState, resultNumber){
 
     console.log('New Search: ' + searchURL);
 
- 
+    fetch(searchURL)
+    .then(response => {
+        if(response.ok){
+            return response.json();
+        }
+        throw new Error(response.statusText);
+    })
+    .then(responseJSON => console.log(responseJSON))
+    .catch(err => alert('what is this noise?'));
     
 }
 
@@ -82,6 +90,8 @@ function getStateCode(requestedState){
 
     
 }
+
+
 
 
 $(prepareStates);
