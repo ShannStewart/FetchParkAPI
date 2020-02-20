@@ -1,36 +1,68 @@
-const urlBase = 'https://api.github.com/users/';
-let requestedUser = '';
+const urlBase = 'https://developer.nps.gov/api/v1/parks?';
+const apiKey = 'AIzaSyCkYLATbWVu42KN49LP6pbjM1Gqd_a_B5Y'
+let requestedState = [];
+let resultNumber = 10;
+
+const states = [{'name': 'Alabama', 'abb':'AL'},{'name': 'Alaska' , 'abb': 'AK'},{'name': 'Arizona', 'abb': 'AZ'},{'name': 'Arkansas', 'abb': 'AR'},{'name': 'California', 'abb': 'CA'},{'name': 'Colorado', 'abb': 'CO'},{'name': 'Connecticut', 'abb': 'CT'},{'name': 'Delaware', 'abb': 'DE'},{'name': 'Florida', 'abb':'FL'},{'name': 'Georgia', 'abb': 'GA'},{'name': 'Hawaii', 'abb':'HI'},{'name': 'Idaho', 'abb': 'ID'},{'name': 'Illinois', 'abb': 'IL'},{'name': 'Indiana', 'abb':'IN'},{'name': 'Iowa', 'abb': 'IA'},{'name': 'Kansas', 'abb': 'KS'},{'name': 'Kentuckey', 'abb': 'KY'},{'name': 'Louisiana', 'abb': 'LA'},{'name': 'Maine', 'abb': 'ME'},{'name': 'Maryland', 'abb': 'MD'},{'name': 'Massachusetts', 'abb':'MA'},{'name': 'Michigan', 'abb': 'MI'},{'name': 'Minnesota', 'abb':'MN'},{'name': 'Mississippi', 'abb':'MS'},{'name': 'Missouri', 'abb':'MO'},{'name': 'Montana', 'abb':'MT'},{'name': 'Nebraska', 'abb':'NE'},{'name': 'Nevada', 'abb':'NV'},{'name': 'New Hampshire', 'abb': 'NH'},{'name': 'New Jersey', 'abb': 'NJ'},{'name': 'New Mexico', 'abb': 'NM'},{'name': 'New York', 'abb': 'NY'},{'name': 'North Carolina', 'abb':'NC'},{'name': 'North Dakota', 'abb':'ND'},{'name': 'Ohio', 'abb':'OH'},{'name': 'Oklahoma', 'abb': 'OK'},{'name': 'Oregon', 'abb': 'OR'},{'name': 'Pennsylvania', 'abb': 'PA'},{'name': 'Rhode Island', 'abb': 'RI'    },{'name': 'South Carolina', 'abb': 'SC'},{'name': 'South Dakota', 'abb': 'SD'},{'name': 'Tennessee', 'abb': 'TN'},{'name': 'Texas', 'abb': 'TX'},{'name': 'Utah', 'abb': 'UT'},{'name': 'Vermont', 'abb': 'VT'},{'name': 'Virginia', 'abb': 'VA'}, {'name': 'Washington', 'abb': 'WA'}, {'name': 'West Virginia', 'abb': 'WV'}, {'name': 'Wisconsin', 'abb': 'WI'}, {'name': 'Wyoming', 'abb': 'WY'}];
+
+function prepareStates(){
+    console.log('prepareStates ran');
+    for (i=0; i < states.length; i++){
+        $('#parkSearch').append(
+            '<div><input type="checkbox" name="' + states[i].name + '" value="' + states[i].abb + '" class="statePark"><label for="' + states[i].name + '">' + states[i].name + '</label></div>'
+        );
+    }
+    readyFunctions();
+}
 
 function readyFunctions(){
     console.log("readyFunction ran");
-    getUser();
+    getPark();
 
 }
 
-async function getUser(){
-    console.log("getUser ran");
+async function getPark(){
+    console.log("getPark ran");
 
     //  await $('#userSearch').off('click');
 
-    await $('#userSearch').on('click', '#findUser', function(event){
+     $('#parkSearch').on('click', '#findParks', function(event){
         event.preventDefault();
         $('#results-list').empty();
         console.log("results emptied");
-        requestedUser = $('input[name="githubUser"]').val();
-    
 
-        gitAPI(requestedUser);
+        $('.statePark:checked').each(function(){
+            requestedState.push($(this).val());
+        });
+
+        resultNumber = $('#js-max-results').val();
+
+        console.log(requestedState);
+        console.log('getting ' + resultNumber + ' parks');
+
+        parkAPI(requestedState, resultNumber);
     });
 }
 
-function gitAPI(){
-    console.log("gitAPI ran");  
-    console.log("You are searching for: " + requestedUser);
+function parkAPI(requestedState, resultNumber){
 
-    let searchURL = urlBase + requestedUser + '/repos';
+    console.log("parkAPI ran");
+
+    let searchURL = urlBase + 'api_key=' + apiKey;
+
+    console.log('Search: ' + searchURL);
+
+    let stateCode = getStateCode(requestedState);
+    console.log('code: ' + stateCode);
+
+    searchURL = searchURL + stateCode;
+
+    let limitCode = '&limit=' + resultNumber;
     
-    console.log("search: " + searchURL); 
-    
+    searchURL = searchURL + limitCode;
+
+    console.log('New Search: ' + searchURL);
+
     fetch(searchURL)
     .then(response => {
         if(response.ok){
@@ -38,28 +70,38 @@ function gitAPI(){
         }
         throw new Error(response.statusText);
     })
-    .then(responseJSON => getRepo(responseJSON))
+    .then(responseJSON => getPark(responseJSON))
     .catch(err => alert('what is this noise?'));
-
+    
 }
 
-function getRepo(userRepo){
-    console.log("getRepo ran");
-    console.log(userRepo);
+function getStateCode(requestedState){
+    console.log('getStateCode ran');
 
-    for (i=0; i<userRepo.length; i++){
+    webCode = [];
 
-    let projectName = "<p>" + userRepo[i].name + "</p>";
-    console.log("Name: " + projectName);
-    let projectURL = "<p>" + userRepo[i].html_url + "</p>";
-    console.log("URL: " + projectURL);
-    let projectInfo = projectName + projectURL;
-
-    $('#results-list').append(
-        projectInfo
-    );
-
+    for (i=0; i < requestedState.length; i++){
+        webCode.push('stateCode=' + requestedState[i]);
     }
+
+    fullCode = '&' + webCode.join('&');
+
+    return fullCode;
+
+    
 }
 
-$(readyFunctions);
+function getPark(responseJSON){
+   console.log('getPark ran');
+
+   for (let i = 0; i < responseJSON.data.length; i++){
+
+             $('#results-list').append(
+
+              
+                "<li><h3>" + responseJSON.data[i].fullName + "</h3><p>" + responseJSON.data[i].description + "</p><a href='" + responseJSON.data[i].url + "'>Link</a></li>"
+            )};
+
+   }
+
+$(prepareStates);
